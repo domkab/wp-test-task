@@ -15,7 +15,7 @@ class Views
     $current_page = max(1, isset($_GET['paged']) ? intval($_GET['paged']) : 1);
     $per_page = 100;
 
-    $sites_data = Helpers::get_sites_data();
+    $sites_data = Helpers::get_sites_ranked();
 
     if (empty($sites_data)) {
       Helpers::render_notice('No data available.', 'error');
