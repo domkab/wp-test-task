@@ -3,11 +3,14 @@ body {
 }
 
 .top-sites__table {
-  width: 75%;
+  width: 50%;
   margin: 0 auto;
 }
 
+ .top_sites__table--rank {
+  width: 15% !important;
+}
 
-.top_sites__table--rank {
-  width: 15%;
+.top-sites__table--domain {
+  text-align: center;
 }
