@@ -39,7 +39,6 @@ class PageRankService
     }
 
     $body = wp_remote_retrieve_body($response);
-    error_log('OpenPageRank API response body: ' . $body);
 
     $data = json_decode($body, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
@@ -112,7 +111,6 @@ class PageRankService
 
     foreach ($domain_chunks as $chunk) {
       $chunk_rank_data = $this->getRanksForDomains($chunk);
-      error_log('Fetched ranking data for chunk: ' . json_encode($chunk_rank_data));
       $rank_data = array_merge($rank_data, $chunk_rank_data);
     }
 
@@ -123,7 +121,6 @@ class PageRankService
         : 0.000;
 
       TopSitesRepo::updateSiteNew($site['id'], $newRank, $domain);
-      error_log("Updated site {$site['id']} ({$domain}) with new rank: {$newRank}");
       $site['page_rank'] = $newRank;
     }
 

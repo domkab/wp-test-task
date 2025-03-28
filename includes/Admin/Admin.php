@@ -6,6 +6,10 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+use Top_Sites_Plugin\TopSites\TopSitesRepo;
+use Top_Sites_Plugin\TopSites\AjaxHandlers;
+use Top_Sites_Plugin\Admin\AdminView;
+
 class Admin
 {
 
@@ -15,6 +19,7 @@ class Admin
     add_action('admin_menu', [$self, 'register_menus']);
     add_action('admin_init', [$self, 'register_settings']);
     add_action('admin_enqueue_scripts', [$self, 'enqueue_admin_assets']);
+    add_action('wp_ajax_search_top_sites', [AjaxHandlers::class, 'searchTopSites']);
   }
 
   public function register_menus()
@@ -53,6 +58,7 @@ class Admin
 
     if (in_array($hook, $allowed_hooks, true)) {
       wp_enqueue_style('tsp-admin-styles', TSP_PLUGIN_URL . 'assets/style.css', [], '1.0.1');
+      wp_enqueue_script('tsp-admin-script', TSP_PLUGIN_URL . 'assets/script.js', ['jquery'], '1.0.1', true);
     }
   }
 

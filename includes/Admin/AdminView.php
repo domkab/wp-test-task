@@ -37,7 +37,12 @@ class AdminView
         <?php self::renderNotice('Warning: No OpenPageRank API key set.', 'error'); ?>
       <?php endif; ?>
 
-      <table class="top-sites__table widefat fixed striped">
+      <div id="search-wrapper">
+        <label for="domain-search">Search Domain:</label>
+        <input type="text" id="domain-search" placeholder="Type a domain name..." />
+      </div>
+
+      <table id="sites-table" class="top-sites__table widefat fixed striped">
         <thead>
           <tr>
             <th class="top-sites__table--rank">Page Rank</th>

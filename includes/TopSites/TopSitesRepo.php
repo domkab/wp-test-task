@@ -107,4 +107,20 @@ class TopSitesRepo
     );
     return $inserted !== false;
   }
+
+  public function searchSites(string $query): array
+  {
+    global $wpdb;
+    $table_name = self::newTableName();
+    $sql = $wpdb->prepare(
+      "SELECT * FROM $table_name WHERE domain_name LIKE %s ORDER BY page_rank DESC",
+      '%' . $wpdb->esc_like($query) . '%'
+    );
+
+    $results = $wpdb->get_results($sql, ARRAY_A);
+
+    error_log('logging the res... ' . print_r($results, true));
+
+    return is_array($results) ? $results : [];
+  }
 }
