@@ -6,20 +6,19 @@ if (! defined('ABSPATH')) {
   exit;
 }
 
-use Top_Sites_Plugin\TopSites\TopSitesRepo;
+use Top_Sites_Plugin\TopSites\PageRankService;
 use Top_Sites_Plugin\Utils\Paginator;
 
 class AdminView
 {
-
   public static function mainPage()
   {
     $apiKey = get_option('openpagerank_api_key');
     $currentPage = max(1, isset($_GET['paged']) ? intval($_GET['paged']) : 1);
     $perPage = 100;
 
-    $repository = new TopSitesRepo();
-    $sitesData = $repository->getAllSitesNew();
+    $service = new PageRankService();
+    $sitesData = $service->updateSitesRanked();
 
     if (empty($sitesData)) {
       self::renderNotice('No data available.', 'error');
@@ -37,15 +36,15 @@ class AdminView
       <table class="top-sites__table widefat fixed striped">
         <thead>
           <tr>
-            <th class="top-sites__table--rank">Rank</th>
+            <th class="top-sites__table--rank">Page Rank</th>
             <th>Domain</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($pagination['data'] as $site) : ?>
             <tr>
-              <td><?= esc_html($site['rank']); ?></td>
-              <td class="top-sites__table--domain"><?= esc_html($site['rootDomain']); ?></td>
+              <td><?= esc_html($site['page_rank']); ?></td>
+              <td class="top-sites__table--domain"><?= esc_html($site['domain_name']); ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

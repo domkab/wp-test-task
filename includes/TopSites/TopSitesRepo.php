@@ -8,15 +8,32 @@ if (!defined('ABSPATH')) {
 
 class TopSitesRepo
 {
-  /**
-   * Returns the new table name.
-   *
-   * @return string
-   */
   public static function newTableName(): string
   {
     global $wpdb;
     return $wpdb->prefix . 'top_sites_new';
+  }
+
+  public static function rawTableName(): string
+  {
+    global $wpdb;
+
+    return $wpdb->prefix . 'top_sites_raw';
+  }
+
+  /**
+   * Retrieves all site records from the raw table.
+   *
+   * @return array Array of sites, each containing 'id' and 'domain_name'.
+   */
+  public function getAllSitesRaw(): array
+  {
+    global $wpdb;
+    $table_name = self::rawTableName();
+    $query = "SELECT * FROM $table_name ORDER BY id ASC";
+    $results = $wpdb->get_results($query, ARRAY_A);
+
+    return is_array($results) ? $results : [];
   }
 
   /**
@@ -30,6 +47,7 @@ class TopSitesRepo
     $table_name = self::newTableName();
     $query = "SELECT * FROM $table_name ORDER BY id ASC";
     $results = $wpdb->get_results($query, ARRAY_A);
+
     return is_array($results) ? $results : [];
   }
 
