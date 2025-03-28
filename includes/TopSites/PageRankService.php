@@ -77,6 +77,7 @@ class PageRankService
   {
     if (!$forceUpdate) {
       $cachedData = get_transient('top_sites_ranked');
+
       if ($cachedData !== false) {
         error_log('Using cached top_sites_ranked data.');
         return $cachedData;
@@ -92,6 +93,7 @@ class PageRankService
     if (empty($sites)) {
       error_log('New table empty. Populating from raw table.');
       $rawSites = $repo->getAllSitesRaw();
+
       foreach ($rawSites as $rawSite) {
         TopSitesRepo::insertSiteNew(
           intval($rawSite['id']),
@@ -99,6 +101,7 @@ class PageRankService
           0.000
         );
       }
+
       $sites = $repo->getAllSitesNew();
     }
 

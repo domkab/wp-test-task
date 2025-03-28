@@ -119,8 +119,6 @@ class TopSitesRepo
 
     $results = $wpdb->get_results($sql, ARRAY_A);
 
-    error_log('logging the res... ' . print_r($results, true));
-
     return is_array($results) ? $results : [];
   }
 }

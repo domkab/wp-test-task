@@ -37,7 +37,7 @@ class AdminView
         <?php self::renderNotice('Warning: No OpenPageRank API key set.', 'error'); ?>
       <?php endif; ?>
 
-      <div id="search-wrapper">
+      <div class="search__form" id="search-wrapper">
         <label for="domain-search">Search Domain:</label>
         <input type="text" id="domain-search" placeholder="Type a domain name..." />
       </div>

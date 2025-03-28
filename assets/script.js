@@ -3,7 +3,6 @@ jQuery(document).ready(function ($) {
 
   $('#domain-search').on('keyup', function () {
     var query = $(this).val().trim()
-    console.log('Search query:', query)
 
     clearTimeout(debounceTimer)
 

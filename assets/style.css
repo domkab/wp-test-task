@@ -15,6 +15,10 @@ body {
   text-align: center;
 }
 
+.search__form {
+  margin-bottom: 24px;
+}
+
 .tablenav {
   display: flex;
   justify-content: center;
