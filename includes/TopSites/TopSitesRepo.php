@@ -41,19 +41,20 @@ class TopSitesRepo
    * @param string $domain_name The domain name.
    * @return bool True on success, false on failure.
    */
-  public static function updateSiteNew(int $oldId, int $newRank, string $domain_name): bool
+  public static function updateSiteNew(int $id, float $newRank, string $domain_name): bool
   {
     global $wpdb;
     $table_name = self::newTableName();
+
     $updated = $wpdb->update(
       $table_name,
       [
-        'id' => $newRank,  // Update the rank value.
+        'page_rank'   => $newRank,
         'domain_name' => $domain_name,
       ],
-      ['id' => $oldId],
+      ['id' => $id],
       [
-        '%d',
+        '%f',
         '%s'
       ],
       ['%d']
