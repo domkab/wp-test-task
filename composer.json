@@ -1,0 +1,11 @@
+{
+  "name": "domkab/top-sites-plugin",
+  "description": "A plugin to display top sites",
+  "type": "wordpress-plugin",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Top_Sites_Plugin\\": "includes/"
+    }
+  }
+}

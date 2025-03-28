@@ -1,39 +1,43 @@
 <?php
 
-namespace Top_Sites_Plugin;
+namespace Top_Sites_Plugin\Admin;
 
-if (!defined('ABSPATH')) {
+if (! defined('ABSPATH')) {
   exit;
 }
 
-class Views
+use Top_Sites_Plugin\TopSites\TopSitesRepo;
+use Top_Sites_Plugin\Utils\Paginator;
+
+class AdminView
 {
 
-  public static function main_page()
+  public static function mainPage()
   {
     $apiKey = get_option('openpagerank_api_key');
-    $current_page = max(1, isset($_GET['paged']) ? intval($_GET['paged']) : 1);
-    $per_page = 100;
+    $currentPage = max(1, isset($_GET['paged']) ? intval($_GET['paged']) : 1);
+    $perPage = 100;
 
-    $sites_data = Helpers::get_sites_ranked();
+    $repository = new TopSitesRepo();
+    $sitesData = $repository->getUpdatedSites();
 
-    if (empty($sites_data)) {
-      Helpers::render_notice('No data available.', 'error');
+    if (empty($sitesData)) {
+      self::renderNotice('No data available.', 'error');
       return;
     }
 
-    $pagination = Helpers::paginate($sites_data, $current_page, $per_page);
+    $pagination = Paginator::paginate($sitesData, $currentPage, $perPage);
 ?>
     <div class="wrap">
       <h1>Top Sites</h1>
       <?php if (empty($apiKey)) : ?>
-        <?php Helpers::render_notice('Warning: No OpenPageRank API key set.', 'error'); ?>
+        <?php self::renderNotice('Warning: No OpenPageRank API key set.', 'error'); ?>
       <?php endif; ?>
 
       <table class="top-sites__table widefat fixed striped">
         <thead>
           <tr>
-            <th class="top_sites__table--rank">Rank</th>
+            <th class="top-sites__table--rank">Rank</th>
             <th>Domain</th>
           </tr>
         </thead>
@@ -56,7 +60,7 @@ class Views
   <?php
   }
 
-  public static function settings_page()
+  public static function settingsPage()
   {
   ?>
     <div class="wrap">
@@ -76,6 +80,15 @@ class Views
         </table>
         <?php submit_button(); ?>
       </form>
+    </div>
+  <?php
+  }
+
+  private static function renderNotice(string $message, string $type = 'success'): void
+  {
+  ?>
+    <div class="notice notice-<?= esc_attr($type); ?>">
+      <p><?= esc_html($message); ?></p>
     </div>
 <?php
   }

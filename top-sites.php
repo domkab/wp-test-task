@@ -15,12 +15,12 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 define('TSP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TSP_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-require_once TSP_PLUGIN_DIR . 'includes/Admin.php';
-
-Top_Sites_Plugin\Admin::init();
+Top_Sites_Plugin\Admin\Admin::init();
 
 register_activation_hook(__FILE__, ['Top_Sites_Plugin\Admin', 'activate']);
 register_deactivation_hook(__FILE__, ['Top_Sites_Plugin\Admin', 'deactivate']);

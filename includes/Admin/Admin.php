@@ -1,29 +1,30 @@
 <?php
-namespace Top_Sites_Plugin;
+
+namespace Top_Sites_Plugin\Admin;
 
 if (!defined('ABSPATH')) {
   exit;
 }
 
-require_once __DIR__ . '/Helpers.php';
-require_once __DIR__ . '/Views.php';
+class Admin
+{
 
-class Admin {
-
-  public static function init() {
+  public static function init()
+  {
     $self = new self();
     add_action('admin_menu', [$self, 'register_menus']);
     add_action('admin_init', [$self, 'register_settings']);
     add_action('admin_enqueue_scripts', [$self, 'enqueue_admin_assets']);
   }
 
-  public function register_menus() {
+  public function register_menus()
+  {
     add_menu_page(
       'Top Sites',
       'Top Sites',
       'manage_options',
       'top-sites',
-      [Views::class, 'main_page'],
+      [AdminView::class, 'mainPage'],
       'dashicons-admin-site',
       2
     );
@@ -34,15 +35,17 @@ class Admin {
       'Settings',
       'manage_options',
       'top-sites-settings',
-      [Views::class, 'settings_page']
+      [AdminView::class, 'settingsPage']
     );
   }
 
-  public function register_settings() {
+  public function register_settings()
+  {
     register_setting('top_sites_settings', 'openpagerank_api_key');
   }
 
-  public function enqueue_admin_assets($hook) {
+  public function enqueue_admin_assets($hook)
+  {
     $allowed_hooks = [
       'toplevel_page_top-sites',
       'top-sites_page_top-sites-settings'
@@ -54,11 +57,7 @@ class Admin {
     }
   }
 
-  public static function activate() {
-    // Activation logic here
-  }
+  public static function activate() {}
 
-  public static function deactivate() {
-    // Deactivation logic here
-  }
+  public static function deactivate() {}
 }
