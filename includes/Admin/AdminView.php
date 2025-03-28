@@ -20,6 +20,10 @@ class AdminView
     $service = new PageRankService();
     $sitesData = $service->updateSitesRanked();
 
+    $sitesData = $currentPage === 1
+      ? $service->updateSitesRanked(true)
+      : $service->updateSitesRanked();
+
     if (empty($sitesData)) {
       self::renderNotice('No data available.', 'error');
       return;
@@ -73,7 +77,11 @@ class AdminView
           <tr valign="top">
             <th>OpenPageRank API Key</th>
             <td>
-              <input type="text" name="openpagerank_api_key" value="<?= esc_attr(get_option('openpagerank_api_key')); ?>" size="50" />
+              <input
+                type="text"
+                name="openpagerank_api_key"
+                value="<?= esc_attr(get_option('openpagerank_api_key')); ?>"
+                size="50" />
             </td>
           </tr>
         </table>

@@ -63,20 +63,35 @@ class PageRankService
 
   /**
    * Updates site rankings by:
-   * 1. Checking if the new table is empty. If so, populate it with raw data.
-   * 2. Fetching new ranking data from the API in batches.
-   * 3. Updating the DB records in the top_sites_new table.
-   * 4. Returning the updated, sorted list of sites.
+   * 1. Checking if the new table is empty. If so, populating it with raw data.
+   * 2. Optionally forcing an API update (if $forceUpdate is true) even if cached data exists.
+   * 3. Otherwise, if cached data exists and $forceUpdate is false, returning the cached data.
+   * 4. Fetching new ranking data from the API in batches,
+   * 5. Updating the DB records in the top_sites_new table,
+   * 6. Caching the updated list for subsequent paginated views,
+   * 7. Returning the updated, sorted list of sites.
    *
+   * @param bool $forceUpdate If true, bypass the transient cache and update via API.
    * @return array Updated sites data.
    */
-  public function updateSitesRanked(): array
+  public function updateSitesRanked(bool $forceUpdate = false): array
   {
+    if (!$forceUpdate) {
+      $cachedData = get_transient('top_sites_ranked');
+      if ($cachedData !== false) {
+        error_log('Using cached top_sites_ranked data.');
+        return $cachedData;
+      }
+    }
+
+    error_log('No cached data found or force update requested. Updating site rankings via API.');
+
     $repo = new TopSitesRepo();
 
     $sites = $repo->getAllSitesNew();
 
     if (empty($sites)) {
+      error_log('New table empty. Populating from raw table.');
       $rawSites = $repo->getAllSitesRaw();
       foreach ($rawSites as $rawSite) {
         TopSitesRepo::insertSiteNew(
@@ -97,23 +112,28 @@ class PageRankService
 
     foreach ($domain_chunks as $chunk) {
       $chunk_rank_data = $this->getRanksForDomains($chunk);
+      error_log('Fetched ranking data for chunk: ' . json_encode($chunk_rank_data));
       $rank_data = array_merge($rank_data, $chunk_rank_data);
     }
 
     foreach ($sites as $site) {
       $domain = $site['domain_name'];
-      $newRank = 0.000;
-      if (isset($rank_data[$domain])) {
-        $newRank = floatval($rank_data[$domain]['page_rank_decimal']);
-      }
+      $newRank = isset($rank_data[$domain])
+        ? floatval($rank_data[$domain]['page_rank_decimal'])
+        : 0.000;
+
       TopSitesRepo::updateSiteNew($site['id'], $newRank, $domain);
+      error_log("Updated site {$site['id']} ({$domain}) with new rank: {$newRank}");
+      $site['page_rank'] = $newRank;
     }
 
     $updatedSites = $repo->getAllSitesNew();
-
     usort($updatedSites, function ($a, $b) {
       return $b['page_rank'] <=> $a['page_rank'];
     });
+
+    set_transient('top_sites_ranked', $updatedSites, 300);
+    error_log('Site rankings updated and cached for 5 minutes.');
 
     return $updatedSites;
   }
