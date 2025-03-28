@@ -6,13 +6,14 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+use Top_Sites_Plugin\TopSites\TopSitesRepo;
+
 class PageRankService
 {
-
   /**
    * Fetch ranking data for a list of domains.
    *
-   * @param array $domains List of domains.
+   * @param array $domains List of domain names.
    * @return array Associative array of domain => rank data.
    */
   public function getRanksForDomains(array $domains): array
@@ -61,16 +62,23 @@ class PageRankService
   }
 
   /**
-   * Update site rankings by fetching new data from the API.
+   * Updates site rankings by fetching new data from the API in batches,
+   * updating the DB records in the top_sites_new table, and returning the updated site list.
    *
-   * @param array $sites List of sites data.
    * @return array Updated sites data.
    */
-  public function updateSitesRanked(array $sites): array
+  public function updateSitesRanked(): array
   {
-    // Extract domains from sites
+    // Retrieve current sites from the new table.
+    $repo = new TopSitesRepo();
+    $sites = $repo->getAllSitesNew(); // Retrieves records from top_sites_new.
+    if (empty($sites)) {
+      return [];
+    }
+
+    // Extract domain names.
     $domains = array_map(function ($site) {
-      return $site['rootDomain'] ?? '';
+      return $site['domain_name'];
     }, $sites);
 
     // Split domains into chunks of 100.
@@ -83,22 +91,27 @@ class PageRankService
       sleep(1); // Respect API rate limits.
     }
 
-    // Update each site with new rank information.
-    foreach ($sites as &$site) {
-      $domainKey = $site['rootDomain'] ?? '';
-      if (isset($rank_data[$domainKey])) {
-        $site['rank'] = floatval($rank_data[$domainKey]['page_rank_decimal']);
-      } else {
-        $site['rank'] = 0;
+    // Update each site record with new ranking information.
+    foreach ($sites as $site) {
+      $domain = $site['domain_name'];
+      // Default new rank is 0.000 if not found.
+      $newRank = 0.000;
+      if (isset($rank_data[$domain])) {
+        $newRank = floatval($rank_data[$domain]['page_rank_decimal']);
       }
+      // Update the record in the new table.
+      TopSitesRepo::updateSiteNew($site['id'], $newRank, $domain);
+      // Optionally update the local $site array.
+      $site['page_rank'] = $newRank;
     }
-    unset($site);
 
-    // Sort sites by descending rank.
-    usort($sites, function ($a, $b) {
-      return $b['rank'] <=> $a['rank'];
+    // Retrieve the updated sites.
+    $updatedSites = $repo->getAllSitesNew();
+    // Sort sites by descending page_rank.
+    usort($updatedSites, function ($a, $b) {
+      return $b['page_rank'] <=> $a['page_rank'];
     });
 
-    return $sites;
+    return $updatedSites;
   }
 }

@@ -53,7 +53,6 @@ class Admin
 
     if (in_array($hook, $allowed_hooks, true)) {
       wp_enqueue_style('tsp-admin-styles', TSP_PLUGIN_URL . 'assets/style.css', [], '1.0.1');
-      wp_enqueue_script('tsp-admin-scripts', TSP_PLUGIN_URL . 'assets/script.js', ['jquery'], '1.0.1', true);
     }
   }
 

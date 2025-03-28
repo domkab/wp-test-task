@@ -19,7 +19,7 @@ class AdminView
     $perPage = 100;
 
     $repository = new TopSitesRepo();
-    $sitesData = $repository->getUpdatedSites();
+    $sitesData = $repository->getAllSitesNew();
 
     if (empty($sitesData)) {
       self::renderNotice('No data available.', 'error');
