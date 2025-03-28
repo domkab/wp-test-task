@@ -14,3 +14,13 @@ body {
 .top-sites__table--domain {
   text-align: center;
 }
+
+.tablenav {
+  display: flex;
+  justify-content: center;
+}
+
+.tablenav .tablenav-pages ul.page-numbers li {
+  display: inline;
+  margin-right: 5px;
+}
