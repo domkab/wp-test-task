@@ -102,8 +102,6 @@ class PageRankServiceTest extends TestCase
       ['id' => 1, 'domain_name' => 'pinterest.com', 'page_rank' => 8.72],
     ]);
 
-    $mockRepo->method('getAllSitesRaw')->willReturn([]);
-
     $service = $this->getMockBuilder(PageRankService::class)
       ->setConstructorArgs([$mockRepo])
       ->onlyMethods(['getRanksForDomains'])

@@ -29,8 +29,6 @@ class PageRankService
     $query   = http_build_query(['domains' => $domains]);
     $url     = $api_url . '?' . $query;
 
-    error_log('OpenPageRank API URL: ' . $url);
-
     $apiKey = get_option('openpagerank_api_key');
     $args   = [
       'headers' => [
@@ -48,6 +46,7 @@ class PageRankService
     $body = wp_remote_retrieve_body($response);
 
     $data = json_decode($body, true);
+
     if (json_last_error() !== JSON_ERROR_NONE) {
       error_log('JSON decode error in getRanksForDomains: ' . json_last_error_msg());
       return [];
