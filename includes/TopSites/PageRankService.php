@@ -10,6 +10,13 @@ use Top_Sites_Plugin\TopSites\TopSitesRepo;
 
 class PageRankService
 {
+  protected $repo;
+
+  public function __construct(?TopSitesRepo $repo = null)
+  {
+    $this->repo = $repo ?: new TopSitesRepo();
+  }
+
   /**
    * Fetch ranking data for a list of domains.
    *
@@ -77,22 +84,20 @@ class PageRankService
   {
     if (!$forceUpdate) {
       $cachedData = get_transient('top_sites_ranked');
-
       if ($cachedData !== false) {
         error_log('Using cached top_sites_ranked data.');
+
         return $cachedData;
       }
     }
 
     error_log('No cached data found or force update requested. Updating site rankings via API.');
 
-    $repo = new TopSitesRepo();
-
-    $sites = $repo->getAllSitesNew();
+    $sites = $this->repo->getAllSitesNew();
 
     if (empty($sites)) {
       error_log('New table empty. Populating from raw table.');
-      $rawSites = $repo->getAllSitesRaw();
+      $rawSites = $this->repo->getAllSitesRaw();
 
       foreach ($rawSites as $rawSite) {
         TopSitesRepo::insertSiteNew(
@@ -102,7 +107,7 @@ class PageRankService
         );
       }
 
-      $sites = $repo->getAllSitesNew();
+      $sites = $this->repo->getAllSitesNew();
     }
 
     $domains = array_map(function ($site) {
@@ -127,7 +132,8 @@ class PageRankService
       $site['page_rank'] = $newRank;
     }
 
-    $updatedSites = $repo->getAllSitesNew();
+    $updatedSites = $this->repo->getAllSitesNew();
+
     usort($updatedSites, function ($a, $b) {
       return $b['page_rank'] <=> $a['page_rank'];
     });
